@@ -52,7 +52,7 @@ termres() {
 	if [[ $xx -gt $wx ]]; then
 		y=$(echo "$yy*$wx/$xx" | bc) 
 		if [[ $y -gt $wy ]]; then
-			echo "$xx*wy/$yy" | bc > xx
+			echo "$xx*$wy/$yy" | bc > xx
 			echo $wy > yy
 		else
 			echo $wx > xx
