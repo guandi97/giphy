@@ -1,0 +1,92 @@
+#! /bin/sh
+
+ninja() {
+	cd ~
+	rm -rf $dir
+	exit
+}
+
+echo loading...
+
+info="$(gifsicle -I $1)"
+dir="/tmp/gif/$$"
+
+mkdir /tmp/gif 2>/dev/null
+mkdir $dir
+cp $1 $dir/
+cd $dir
+
+trap ninja SIGHUP SIGINT SIGTERM
+
+xx=$(echo "$info" | grep screen | awk '{print $3}' | awk -F x '{print $1}')
+yy=$(echo "$info" | grep screen | awk '{print $3}' | awk -F x '{print $2}')
+delay=$(echo "$info" | grep delay | head -1 | awk '{print $NF}' | tr -d 's')
+
+:<<DEBUG
+echo "$info"
+echo $dir
+echo $xx $yy $delay 
+DEBUG
+
+gifsicle -e $1
+
+#:<<transparency
+trans=$(echo "$info" | grep transparent | grep 255)
+if [[ $trans ]]; then
+	j=$(ls -1 | grep gif.000)
+	for f in *gif.*; do
+		composite $f $j $f
+		j=$f;
+	done
+fi
+#transparency
+
+clear
+echo -e "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+
+############################
+
+termres() {
+	wx=$(xwininfo -id $WINDOWID | grep Width | awk '{print $2}')
+	wy=$(xwininfo -id $WINDOWID | grep Height | awk '{print $2}')
+	if [[ $xx -gt $wx ]]; then
+		y=$(echo "$yy*$wx/$xx" | bc) 
+		if [[ $y -gt $wy ]]; then
+			echo "$xx*wy/$yy" | bc > xx
+			echo $wy > yy
+		else
+			echo $wx > xx
+			echo $y > yy
+		fi
+	elif [[ $yy -gt $wy ]]; then
+		echo "$xx*$wy/$yy" | bc > xx
+		echo $wy > yy
+	else
+		echo $xx > xx
+		echo $yy > yy
+	fi
+	echo "$(cat xx)*$(cat yy)" > na
+		
+}
+
+nxtFrm() {
+	echo -e "0;1;0;0;$(cat xx);$(cat yy);;;;;$f\n4;\n3;" | /usr/lib/w3m/w3mimgdisplay
+
+	if [[ $(cat na) -ne $(cat oa) ]]; then
+		clear
+		echo -e "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+		echo $(cat na) > oa
+	fi
+}
+
+
+termres
+#:<<LOOP
+while true; do
+	for f in *gif.*; do
+		sleep $delay
+		nxtFrm &
+		termres &
+	done
+done
+#LOOP
