@@ -28,7 +28,14 @@ echo $dir
 echo $xx $yy $delay 
 DEBUG
 
+#:<<DEFAULTDELAY
+if [ ! $delay ]; then
+	delay=0.1 
+fi
+#DEFAULTDELAY
+
 gifsicle -e $1
+touch oa
 
 #:<<transparency
 trans=$(echo "$info" | grep transparent | grep 255)
@@ -65,10 +72,9 @@ termres() {
 		echo $xx > xx
 		echo $yy > yy
 	fi
-	echo "$(cat xx)*$(cat yy)" > na
+	echo "$(cat xx)*$(cat yy)" | bc > na
 		
 }
-
 nxtFrm() {
 	echo -e "0;1;0;0;$(cat xx);$(cat yy);;;;;$f\n4;\n3;" | /usr/lib/w3m/w3mimgdisplay
 
