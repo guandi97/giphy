@@ -49,9 +49,9 @@ fi
 #transparency
 
 clear
+echo "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
 
 ############################
-#echo -e "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
 
 termres() {
 	wx=$(xwininfo -id $WINDOWID | grep Width | awk '{print $2}')
@@ -76,26 +76,23 @@ termres() {
 		
 }
 nxtFrm() {
-	#echo -e "0;1;0;0;$(cat xx);$(cat yy);;;;;$f\n4;\n3;" 
-	echo -e "0;1;0;0;$(cat xx);$(cat yy);;;;;$f\n3;" 
+	clear
+	echo "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+	echo -e "0;1;0;0;$(cat xx);$(cat yy);;;;;$f\n4;\n3;" | /usr/libexec/w3m/w3mimgdisplay 
 
 	if [[ $(cat na) -ne $(cat oa) ]]; then
 		echo $(cat na) > oa
 	fi
 }
 
+
 termres
 #:<<LOOP
-output_gen() {
-	while true; do
-		for f in *gif.*; do
-			sleep $delay
-			nxtFrm &
-			termres &
-		done
+while true; do
+	for f in *gif.*; do
+		sleep $delay
+		nxtFrm &
+		termres &
 	done
-}
+done
 #LOOP
-
-#output_gen | /usr/libexec/w3m/w3mimgdisplay 1>/dev/null
-output_gen | /home/derpy/Documents/git/w3m/w3mimgdisplay
