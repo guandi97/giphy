@@ -20,17 +20,20 @@ trap ninja SIGHUP SIGINT SIGTERM
 
 xx=$(echo "$info" | grep screen | awk '{print $3}' | awk -F x '{print $1}')
 yy=$(echo "$info" | grep screen | awk '{print $3}' | awk -F x '{print $2}')
-delay=$(echo "$info" | grep delay | head -1 | awk '{print $NF}' | tr -d 's')
+#delay=$(echo "$info" | grep delay | head -1 | awk '{print $NF}' | tr -d 's')
+delay=$(echo "$info" | grep delay | awk '{print $NF}' | tr -d 's')
+img=$(echo "$info" | grep 'image ')
 
 :<<DEBUG
 echo "$info"
 echo $dir
 echo $xx $yy $delay 
+echo "$delay"
 DEBUG
 
 #:<<DEFAULTDELAY
-if [ ! $delay ]; then
-	delay=0.1 
+if [ ! "$delay" ]; then
+	delay="0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n0.1\n"
 fi
 #DEFAULTDELAY
 
@@ -38,11 +41,20 @@ gifsicle -e $1
 touch oa
 
 #:<<transparency
+offset=""
 trans=$(echo "$info" | grep transparent | grep 255)
 if [[ $trans ]]; then
+	i=0;
 	j=$(ls -1 | grep gif.000)
 	for f in *gif.*; do
-		composite $f $j $f
+		i=$((i+1))
+		echo "$offset"
+		if [ "$offset" ]; then
+			composite -geometry "$offset" $f $j $f
+		else 
+			composite $f $j $f
+		fi	
+		offset="+$(echo "$img" | grep at | awk '{print $6}' | sed -n "${i}p" | tr ',' '+')"
 		j=$f;
 	done
 fi
@@ -51,7 +63,6 @@ fi
 clear
 
 ############################
-#echo -e "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
 
 termres() {
 	wx=$(xwininfo -id $WINDOWID | grep Width | awk '{print $2}')
@@ -76,7 +87,6 @@ termres() {
 		
 }
 nxtFrm() {
-	#echo -e "0;1;0;0;$(cat xx);$(cat yy);;;;;$f\n4;\n3;" 
 	echo -e "0;1;0;0;$(cat xx);$(cat yy);;;;;$f\n3;" 
 
 	if [[ $(cat na) -ne $(cat oa) ]]; then
@@ -88,8 +98,10 @@ termres
 #:<<LOOP
 output_gen() {
 	while true; do
+		i=0
 		for f in *gif.*; do
-			sleep $delay
+			i=$((i+1))
+			sleep "$(echo "$delay" | sed -n "${i}p")"
 			nxtFrm &
 			termres &
 		done
@@ -97,5 +109,7 @@ output_gen() {
 }
 #LOOP
 
-#output_gen | /usr/libexec/w3m/w3mimgdisplay 1>/dev/null
-output_gen | /home/derpy/Documents/git/w3m/w3mimgdisplay
+#output_gen | /home/derpy/Documents/git/w3m/w3mimgdisplay
+#output_gen | /home/derpy/Documents/git/w3mimgdisplay/w3mimgdisplay
+output_gen | /usr/libexec/w3m/w3mimgdisplay
+#output_gen 
